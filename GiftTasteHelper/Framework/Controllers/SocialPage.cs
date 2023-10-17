@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
@@ -21,6 +22,7 @@ namespace GiftTasteHelper.Framework
         private List<ClickableTextureComponent> FriendSlots;
         private List<object> Names; // Other player names are ints, NPC names are strings.
 
+        private int FirstCharacterIndex;
         private SVector2 SlotBoundsOffset;
         private float SlotHeight;
         private Rectangle PageBounds;
@@ -46,6 +48,8 @@ namespace GiftTasteHelper.Framework
             this.FriendSlots = this.Reflection.GetField<List<ClickableTextureComponent>>(this.NativeSocialPage, "sprites").GetValue();
             this.Names = this.Reflection.GetField<List<object>>(this.NativeSocialPage, "names").GetValue();
 
+            // Find the first NPC character slot
+            this.FirstCharacterIndex = this.Names.FindIndex(obj => obj is string);
             if (this.FriendSlots.Count == 0)
             {
                 Utils.DebugLog("Failed to init SocialPage: No friend slots found.", LogLevel.Error);
@@ -112,13 +116,13 @@ namespace GiftTasteHelper.Framework
 
         private float GetSlotHeight()
         {
-            return (this.FriendSlots[1].bounds.Y - this.FriendSlots[0].bounds.Y);
+            return (this.FriendSlots[this.FirstCharacterIndex + 1].bounds.Y - this.FriendSlots[this.FirstCharacterIndex].bounds.Y);
         }
 
         // Creates the bounds around all the slots on the screen within the page border.
         private Rectangle MakePageBounds()
         {
-            var rect = MakeSlotBounds(this.FriendSlots[0]);
+            var rect = MakeSlotBounds(this.FriendSlots[this.FirstCharacterIndex]);
             rect.Height = (int)this.SlotHeight * SDVSocialPage.slotsOnPage;
             return rect;
         }
