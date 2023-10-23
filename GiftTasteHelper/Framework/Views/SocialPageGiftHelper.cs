@@ -63,7 +63,11 @@ namespace GiftTasteHelper.Framework
                 return;
             }
 
-            SVector2 mousePos = new SVector2(e.NewPosition.ScreenPixels.X, e.NewPosition.ScreenPixels.Y);
+            // Adjusting mouse position based on the UI scale.
+            int adjustedMouseX = (int)((double)Game1.getMouseXRaw() / (double)Game1.options.uiScale);
+            int adjustedMouseY = (int)((double)Game1.getMouseYRaw() / (double)Game1.options.uiScale);
+
+            SVector2 mousePos = new SVector2(adjustedMouseX, adjustedMouseY);
             UpdateHoveredNPC(mousePos);
         }
 
