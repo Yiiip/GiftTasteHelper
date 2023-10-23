@@ -47,7 +47,12 @@ namespace GiftTasteHelper.Framework
         public override bool CanTick()
         {
             // we don't have a tab-changed event so don't tick when the social tab isn't open
-            return this.IsCorrectMenuTab(Game1.activeClickableMenu) && base.CanTick();
+            bool isCorrectMenuTab = this.IsCorrectMenuTab(Game1.activeClickableMenu);
+            if (!isCorrectMenuTab)
+            {
+                this.DrawCurrentFrame = false;
+            }
+            return isCorrectMenuTab && base.CanTick();
         }
 
         public override void OnCursorMoved(CursorMovedEventArgs e)
