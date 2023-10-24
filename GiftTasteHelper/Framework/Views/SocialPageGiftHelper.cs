@@ -58,8 +58,7 @@ namespace GiftTasteHelper.Framework
                 return;
             }
 
-            SVector2 mousePos = new SVector2(e.NewPosition.ScreenPixels.X, e.NewPosition.ScreenPixels.Y);
-            UpdateHoveredNPC(mousePos);
+            UpdateHoveredNPC(GetAdjustedCursorPosition(e.NewPosition.ScreenPixels.X, e.NewPosition.ScreenPixels.Y));
         }
 
         public override bool WantsUpdateEvent()
@@ -140,8 +139,10 @@ namespace GiftTasteHelper.Framework
             // We currently only check if the hovered npc changed during mouse move events, so if the user
             // scrolls the list without moving the mouse the tooltip won't change and it will be incorrect.
             // Listening for when the slot index changes fixes this.
-            SVector2 mouse = new SVector2(Game1.getMouseX(), Game1.getMouseY());
-            UpdateHoveredNPC(mouse);
+            UpdateHoveredNPC(GetAdjustedCursorPosition(Game1.getMouseX(), Game1.getMouseY()));
         }
+
+        private static SVector2 GetAdjustedCursorPosition(float x, float y)
+            => new SVector2(x, y) * Game1.options.zoomLevel / Game1.options.uiScale;
     }
 }
