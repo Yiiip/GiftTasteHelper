@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using StardewModdingAPI;
@@ -47,12 +47,7 @@ namespace GiftTasteHelper.Framework
         public override bool CanTick()
         {
             // we don't have a tab-changed event so don't tick when the social tab isn't open
-            bool isCorrectMenuTab = this.IsCorrectMenuTab(Game1.activeClickableMenu);
-            if (!isCorrectMenuTab)
-            {
-                this.DrawCurrentFrame = false;
-            }
-            return isCorrectMenuTab && base.CanTick();
+            return this.IsCorrectMenuTab(Game1.activeClickableMenu) && base.CanTick();
         }
 
         public override void OnCursorMoved(CursorMovedEventArgs e)
@@ -63,12 +58,7 @@ namespace GiftTasteHelper.Framework
                 return;
             }
 
-            // Adjusting mouse position based on the UI scale.
-            int adjustedMouseX = (int)((double)Game1.getMouseXRaw() / (double)Game1.options.uiScale);
-            int adjustedMouseY = (int)((double)Game1.getMouseYRaw() / (double)Game1.options.uiScale);
-
-            SVector2 mousePos = new SVector2(adjustedMouseX, adjustedMouseY);
-            UpdateHoveredNPC(mousePos);
+            UpdateHoveredNPC(GetAdjustedCursorPosition(e.NewPosition.ScreenPixels.X, e.NewPosition.ScreenPixels.Y));
         }
 
         public override bool WantsUpdateEvent()
@@ -149,8 +139,10 @@ namespace GiftTasteHelper.Framework
             // We currently only check if the hovered npc changed during mouse move events, so if the user
             // scrolls the list without moving the mouse the tooltip won't change and it will be incorrect.
             // Listening for when the slot index changes fixes this.
-            SVector2 mouse = new SVector2(Game1.getMouseX(), Game1.getMouseY());
-            UpdateHoveredNPC(mouse);
+            UpdateHoveredNPC(GetAdjustedCursorPosition(Game1.getMouseX(), Game1.getMouseY()));
         }
+
+        private static SVector2 GetAdjustedCursorPosition(float x, float y)
+            => new SVector2(x, y) * Game1.options.zoomLevel / Game1.options.uiScale;
     }
 }
