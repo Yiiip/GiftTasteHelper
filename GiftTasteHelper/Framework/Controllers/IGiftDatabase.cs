@@ -6,9 +6,9 @@
     {
         event DataSourceChangedDelegate DatabaseChanged;
 
-        bool AddGift(string npcName, int itemId, GiftTaste taste);
-        bool AddGifts(string npcName, GiftTaste taste, int[] itemIds);
+        bool AddGift(string npcName, string itemId, GiftTaste taste);
+        bool AddGifts(string npcName, GiftTaste taste, string[] itemIds);
 
-        int[] GetGiftsForTaste(string npcName, GiftTaste taste);
+        string[] GetGiftsForTaste(string npcName, GiftTaste taste);
     }
 }

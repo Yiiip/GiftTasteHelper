@@ -18,9 +18,9 @@ namespace GiftTasteHelper.Framework
             this.Database.DatabaseChanged += () => DataSourceChanged?.Invoke();
         }
 
-        public virtual IEnumerable<int> GetGifts(string npcName, GiftTaste taste, bool includeUniversal)
+        public virtual IEnumerable<string> GetGifts(string npcName, GiftTaste taste, bool includeUniversal)
         {
-            IEnumerable<int> gifts = Database.GetGiftsForTaste(npcName, taste);
+            IEnumerable<string> gifts = Database.GetGiftsForTaste(npcName, taste);
             if (includeUniversal)
             {
                 // Individual NPC tastes may conflict with the universal ones.
@@ -29,7 +29,7 @@ namespace GiftTasteHelper.Framework
             return gifts;
         }
 
-        public virtual IEnumerable<int> GetUniversalGifts(string npcName, GiftTaste taste)
+        public virtual IEnumerable<string> GetUniversalGifts(string npcName, GiftTaste taste)
         {
             return Database.GetGiftsForTaste(Utils.UniversalTasteNames[taste], taste)
                 .Where(itemId => Utils.GetTasteForGift(npcName, itemId) == taste);
@@ -45,7 +45,7 @@ namespace GiftTasteHelper.Framework
         {
         }
 
-        public override IEnumerable<int> GetGifts(string npcName, GiftTaste taste, bool includeUniversal)
+        public override IEnumerable<string> GetGifts(string npcName, GiftTaste taste, bool includeUniversal)
         {
             // Universal gifts are stored with the regular ones in the DB so we need to remove them if they shouldn't be included.
             var gifts = base.GetGifts(npcName, taste, includeUniversal);
@@ -59,7 +59,7 @@ namespace GiftTasteHelper.Framework
             return gifts;
         }
 
-        public override IEnumerable<int> GetUniversalGifts(string npcName, GiftTaste taste)
+        public override IEnumerable<string> GetUniversalGifts(string npcName, GiftTaste taste)
         {
             var universal = Utils.GetItemsForTaste(Utils.UniversalTasteNames[taste], taste);
             return Database.GetGiftsForTaste(npcName, taste).Intersect(universal);

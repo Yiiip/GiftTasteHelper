@@ -44,7 +44,6 @@ namespace GiftTasteHelper
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
 
             InitDebugCommands(this.Helper);
-
             Startup();
         }
 
@@ -155,7 +154,7 @@ namespace GiftTasteHelper
         // Gift Monitor Handling
         // ===================================================================
 
-        private void OnGiftGiven(string npc, int itemId)
+        private void OnGiftGiven(string npc, string itemId)
         {
             var taste = Utils.GetTasteForGift(npc, itemId);
             if (taste != GiftTaste.MAX)
@@ -371,7 +370,7 @@ namespace GiftTasteHelper
                 }
                 Game1.warpFarmer(location, x / Game1.tileSize, y / Game1.tileSize, false);
             });
-
+            /*
             helper.ConsoleCommands.Add("setup", "", (name, args) =>
             {
                 helper.ConsoleCommands.Trigger("world_settime", new string[] { "1000" });
@@ -382,6 +381,7 @@ namespace GiftTasteHelper
                     helper.ConsoleCommands.Trigger("player_add", new string[] { "Object", item.ToString(), "10" });
                 }
             });
+            */
 #endif
         }
         #endregion

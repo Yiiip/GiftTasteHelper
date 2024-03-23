@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using StardewModdingAPI;
 
@@ -25,7 +26,7 @@ namespace GiftTasteHelper.Framework
         }
 
         /// <summary>Returns if the database has an item for a particular NPC stored.</summary>
-        public bool ContainsGift(string npcName, int itemId, GiftTaste taste)
+        public bool ContainsGift(string npcName, string itemId, GiftTaste taste)
         {
             if (taste == GiftTaste.MAX)
             {
@@ -35,7 +36,7 @@ namespace GiftTasteHelper.Framework
         }
 
         /// <summary>Adds an item for an npc to the database.</summary>
-        public virtual bool AddGift(string npcName, int itemId, GiftTaste taste)
+        public virtual bool AddGift(string npcName, string itemId, GiftTaste taste)
         {
             if (taste == GiftTaste.MAX)
             {
@@ -61,7 +62,7 @@ namespace GiftTasteHelper.Framework
         }
 
         /// <summary>Adds a range of items for an npc to the database.</summary>
-        public virtual bool AddGifts(string npcName, GiftTaste taste, int[] itemIds)
+        public virtual bool AddGifts(string npcName, GiftTaste taste, string[] itemIds)
         {
             if (taste == GiftTaste.MAX)
             {
@@ -85,7 +86,7 @@ namespace GiftTasteHelper.Framework
         }
 
         /// <summary>Returns all the gifts of the given taste in the database for that npc.</summary>
-        public int[] GetGiftsForTaste(string npcName, GiftTaste taste)
+        public string[] GetGiftsForTaste(string npcName, GiftTaste taste)
         {
             if (Database.Entries.ContainsKey(npcName))
             {
@@ -95,7 +96,7 @@ namespace GiftTasteHelper.Framework
                     return entryForTaste.Select(model => model.ItemId).ToArray();
                 }
             }
-            return new int[] { };
+            return Array.Empty<string>();
         }
     }
 
@@ -164,7 +165,7 @@ namespace GiftTasteHelper.Framework
             newDb.Write();
         }
 
-        public override bool AddGift(string npcName, int itemId, GiftTaste taste)
+        public override bool AddGift(string npcName, string itemId, GiftTaste taste)
         {
             if (base.AddGift(npcName, itemId, taste))
             {
@@ -174,7 +175,7 @@ namespace GiftTasteHelper.Framework
             return false;
         }
 
-        public override bool AddGifts(string npcName, GiftTaste taste, int[] itemIds)
+        public override bool AddGifts(string npcName, GiftTaste taste, string[] itemIds)
         {
             if (base.AddGifts(npcName, taste, itemIds))
             {

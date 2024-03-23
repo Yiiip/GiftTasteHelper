@@ -2,15 +2,16 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
 using StardewValley;
+using StardewValley.GameData.Objects;
 
 namespace GiftTasteHelper.Framework
 {
     internal struct ItemCategory
     {
-        public const int InvalidId = 0;
+        public const string InvalidId = "-";
 
         public string Name;
-        public int ID;
+        public string ID;
 
         public bool Valid => ID != InvalidId;
     }
@@ -35,12 +36,12 @@ namespace GiftTasteHelper.Framework
         public int Price;
         public int Edibility;
         public ItemCategory Category;
-        public int ID;
-        public Rectangle TileSheetSourceRect;
+        public string ID;
+        public int SpriteIndex;
         public SVector2 NameSize;
 
-        public bool Edible => Edibility > InEdible;
-        public bool TastesBad => Edibility < 0;
+        public readonly bool Edible => Edibility > InEdible;
+        public readonly bool TastesBad => Edibility < 0;
 
         /*********
         ** Public methods
@@ -50,51 +51,41 @@ namespace GiftTasteHelper.Framework
             return $"{{ID: {this.ID}, Name: {this.DisplayName}}}";
         }
 
-        public static ItemCategory GetCategory(int itemId)
+        public static ItemCategory GetCategory(string itemId)
         {
-            return GetCategory(Game1.objectInformation[itemId]);
-        }
-
-        public static ItemCategory GetCategory(string objectInfo)
-        {
-            int categoryId = ItemCategory.InvalidId;
-            var typeInfo = objectInfo.Split('/')[TypeIndex];
-            var parts = typeInfo.Split(' '); // CategoryName [CategoryNumber]
-            // Not all items have category numbers for some reason
-            if (parts.Length > 1)
+            if (!Game1.objectData.ContainsKey(itemId)) 
             {
-                int.TryParse(parts[1], out categoryId);
+                return new ItemCategory { Name = "", ID = ItemCategory.InvalidId };
             }
-            return new ItemCategory { Name = parts[0], ID = categoryId };
+            return new ItemCategory { Name = Game1.objectData[itemId].Name, ID = itemId };
         }
 
-        public static ItemData MakeItem(int itemId)
+        public static ItemData MakeItem(string itemId)
         {
-            if (!Game1.objectInformation.ContainsKey(itemId))
+            if (!Game1.objectData.ContainsKey(itemId))
             {
                 throw new System.ArgumentException($"Tried creating an item with an invalid id: {itemId}");
             }
 
-            string objectInfo = Game1.objectInformation[itemId];
-            string[] parts = objectInfo.Split('/');
+            ObjectData objectInfo = Game1.objectData[itemId];
 
             return new ItemData
             {
-                Name = parts[ItemData.NameIndex],
-                DisplayName = parts[ItemData.DisplayNameIndex],
-                Price = int.Parse(parts[ItemData.PriceIndex]),
-                Edibility = int.Parse(parts[ItemData.EdibilityIndex]),
+                Name = objectInfo.Name,
+                DisplayName = objectInfo.DisplayName,
+                Price = objectInfo.Price,
+                Edibility = objectInfo.Edibility,
                 ID = itemId,
-                Category = ItemData.GetCategory(objectInfo),
-                TileSheetSourceRect = Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, itemId, 16, 16),
-                NameSize = SVector2.MeasureString(parts[ItemData.DisplayNameIndex], Game1.smallFont)
+                Category = ItemData.GetCategory(itemId),
+                SpriteIndex = objectInfo.SpriteIndex,
+                NameSize = SVector2.MeasureString(objectInfo.DisplayName, Game1.smallFont)
             };
         }
 
-        public static ItemData[] MakeItemsFromIds(IEnumerable<int> itemIds)
+        public static ItemData[] MakeItemsFromIds(IEnumerable<string> itemIds)
         {
             return itemIds
-                .Where(id => Game1.objectInformation.ContainsKey(id))
+                .Where(id => Game1.objectData.ContainsKey(id))
                 .Select(id => ItemData.MakeItem(id)).ToArray();
         }
     }

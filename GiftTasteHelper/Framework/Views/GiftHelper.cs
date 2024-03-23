@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.TokenizableStrings;
 
 namespace GiftTasteHelper.Framework
 {
@@ -160,8 +162,8 @@ namespace GiftTasteHelper.Framework
             }
 
             float spriteScale = 2.0f * this.ZoomLevel; // 16x16 is pretty small
-            Rectangle spriteRect = numItemsToDraw > 0 ? drawData.IconSize : new Rectangle(0, 0, 0, 0); // We just need the dimensions which we assume are all the same
-            SVector2 scaledSpriteSize = new SVector2(spriteRect.Width * spriteScale, spriteRect.Height * spriteScale);
+            SVector2 spriteSize = numItemsToDraw > 0 ? GiftInfo.IconSize : SVector2.Zero; // We just need the dimensions which we assume are all the same
+            SVector2 scaledSpriteSize = spriteSize * spriteScale;
 
             // The longest length of text will help us determine how wide the tooltip box should be 
             SVector2 titleSize = SVector2.MeasureString(title, Game1.smallFont);
@@ -183,7 +185,7 @@ namespace GiftTasteHelper.Framework
             // Create new columns of items shown if they will go off screen.
             if (height > viewportH)
             {
-                numItemsPerColumn = ((viewportH - spriteRect.Height) / rowHeight) - 1; // Remove an item to make space for the title
+                numItemsPerColumn = ((viewportH - spriteSize.YInt) / rowHeight) - 1; // Remove an item to make space for the title
                 height = this.AdjustForTileSize(rowHeight * (numItemsPerColumn + 1));
 
                 int columnsToDraw = (numItemsToDraw - 1) / numItemsPerColumn + 1;
@@ -211,7 +213,7 @@ namespace GiftTasteHelper.Framework
 
             // Offset the sprite from the corner of the bg, and the text to the right and centered vertically of the sprite
             SVector2 spriteOffset = new SVector2(this.AdjustForTileSize(tooltipPos.X, 0.25f), this.AdjustForTileSize(tooltipPos.Y, 0.25f));
-            SVector2 textOffset = new SVector2(spriteOffset.X, spriteOffset.Y + (spriteRect.Height / 2));
+            SVector2 textOffset = new SVector2(spriteOffset.X, spriteOffset.Y + (spriteSize.YInt / 2));
 
             // TODO: fix weird title y offset when there are > 0 items.
             // Draw the title then set up the offset for the remaining text
@@ -231,8 +233,12 @@ namespace GiftTasteHelper.Framework
 
                 // Draw the sprite for the item then the item text
                 var textColor = gift.Universal && this.GiftConfig.ColorizeUniversalGiftNames ? Color.Blue : Game1.textColor;
-                this.DrawText(item.DisplayName, textOffset, textColor);
-                this.DrawTexture(Game1.objectSpriteSheet, spriteOffset, item.TileSheetSourceRect, spriteScale);
+                var texture = ItemRegistry.GetData(item.ID).GetTexture();
+                var tileSheetSourceRect = Game1.getSourceRectForStandardTileSheet(texture, item.SpriteIndex, GiftInfo.IconSize.XInt, GiftInfo.IconSize.YInt);
+                this.DrawText(TokenParser.ParseText(item.DisplayName), textOffset, textColor);
+                // TODO: Fails to draw non item textures (such as books)
+                this.DrawTexture(texture, spriteOffset, tileSheetSourceRect, spriteScale);
+                
 
                 if ((i + 1) % numItemsPerColumn == 0)
                 {

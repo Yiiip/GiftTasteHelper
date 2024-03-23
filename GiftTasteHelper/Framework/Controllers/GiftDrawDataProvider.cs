@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
 using StardewValley;
 
 namespace GiftTasteHelper.Framework
 {
     internal class GiftInfo
     {
+        public static readonly SVector2 IconSize = new (16, 16);
         public ItemData Item;
         public GiftTaste Taste;
         public bool Universal;
@@ -15,7 +15,6 @@ namespace GiftTasteHelper.Framework
 
     internal class GiftDrawData
     {
-        public Rectangle IconSize => this.Gifts.First().Item.TileSheetSourceRect;
         public string NpcName { get; }
         public GiftInfo[] Gifts;
 

@@ -3,7 +3,7 @@
     /// <summary>Delegate for the GiftGiven event.</summary>
     /// <param name="npc">Name of the NPC the gift was given to.</param>
     /// <param name="itemId">The item id (parentSheetIndex) of the item that was given.</param>
-    delegate void GiftGivenDelegate(string npc, int itemId);
+    delegate void GiftGivenDelegate(string npc, string itemId);
 
     /// <summary>Monitors and alerts when a gift is given to an npc.</summary>
     internal interface IGiftMonitor

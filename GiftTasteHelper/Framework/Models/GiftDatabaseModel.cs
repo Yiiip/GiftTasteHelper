@@ -7,9 +7,9 @@ namespace GiftTasteHelper.Framework
     /// <summary>Model for a gift item.</summary>
     internal class GiftModel
     {
-        public int ItemId { get; set; }
+        public string ItemId { get; set; }
 
-        public static explicit operator int(GiftModel model)
+        public static explicit operator string(GiftModel model)
         {
             return model.ItemId;
         }
@@ -27,7 +27,7 @@ namespace GiftTasteHelper.Framework
             private set => Entries[taste] = value;
         }
 
-        public bool Contains(GiftTaste taste, int itemId)
+        public bool Contains(GiftTaste taste, string itemId)
         {
             return Entries.ContainsKey(taste) && Entries[taste].Any(model => model.ItemId == itemId);
         }

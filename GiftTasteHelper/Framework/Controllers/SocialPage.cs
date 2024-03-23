@@ -20,7 +20,6 @@ namespace GiftTasteHelper.Framework
         private IReflectionHelper Reflection;
 
         private List<ClickableTextureComponent> FriendSlots;
-        private List<object> Names; // Other player names are ints, NPC names are strings.
 
         private int FirstCharacterIndex;
         private SVector2 SlotBoundsOffset;
@@ -46,10 +45,9 @@ namespace GiftTasteHelper.Framework
         {
             this.NativeSocialPage = nativePage;
             this.FriendSlots = this.Reflection.GetField<List<ClickableTextureComponent>>(this.NativeSocialPage, "sprites").GetValue();
-            this.Names = this.Reflection.GetField<List<object>>(this.NativeSocialPage, "names").GetValue();
 
             // Find the first NPC character slot
-            this.FirstCharacterIndex = this.Names.FindIndex(obj => obj is string);
+            this.FirstCharacterIndex = this.NativeSocialPage.SocialEntries.FindIndex(entry => !entry.IsPlayer);
             if (this.FriendSlots.Count == 0)
             {
                 Utils.DebugLog("Failed to init SocialPage: No friend slots found.", LogLevel.Error);
@@ -99,9 +97,9 @@ namespace GiftTasteHelper.Framework
                 var friend = this.FriendSlots[i];
                 var bounds = this.MakeSlotBounds(friend);
 
-                if (bounds.Contains(mousePoint) && Utils.Ensure(i < this.Names.Count, "Name index out of range"))
+                if (bounds.Contains(mousePoint) && Utils.Ensure(i < this.NativeSocialPage.SocialEntries.Count, "Name index out of range"))
                 {
-                    hoveredFriendName = this.Names[i] as string;
+                    hoveredFriendName = this.NativeSocialPage.SocialEntries[i].InternalName;
                     break;
                 }
             }

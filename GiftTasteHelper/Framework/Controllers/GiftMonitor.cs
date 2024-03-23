@@ -84,7 +84,7 @@ namespace GiftTasteHelper.Framework
                 }
 
                 this.PriorGiftsGiven = this.GiftsGiven;
-                var itemId = this.HeldGift.ParentSheetIndex;
+                var itemId = this.HeldGift.itemId.Value;
                 this.HeldGift = null;
 
                 if (Utils.Ensure(npcGivenTo != null, "NPC given to is null!"))
