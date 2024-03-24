@@ -113,30 +113,25 @@ namespace GiftTasteHelper.Framework
         public static string[] GetItemsForTaste(string npcName, GiftTaste taste)
         {
             Debug.Assert(taste != GiftTaste.MAX);
-            if (!Game1.NPCGiftTastes.ContainsKey(npcName))
+            if (npcName == null || !Game1.NPCGiftTastes.TryGetValue(npcName, out var giftTaste))
             {
                 return Array.Empty<string>();
             }
 
-            var giftTaste = Game1.NPCGiftTastes[npcName];
             if (UniversalTastes.ContainsKey(npcName))
             {
                 // Universal tastes are parsed differently
                 return giftTaste.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             }
 
-            string[] giftTastes = giftTaste.Split('/');
-            if (giftTastes.Length == 0)
-            {
-                return Array.Empty<string>();
-            }
-
             // See http://stardewvalleywiki.com/Modding:Gift_taste_data
             int tasteIndex = (int)taste + 1; // Enum value is the even number which is the dialogue, odd is the list of item refs.
-            if (giftTastes[tasteIndex].Length > 0)
+            string[] giftTastes = giftTaste.Split('/');
+            if (giftTastes.Length > tasteIndex && giftTastes[tasteIndex].Length > 0)
             {
                 return giftTastes[tasteIndex].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             }
+
             return Array.Empty<string>();
         }
 

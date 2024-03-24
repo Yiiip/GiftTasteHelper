@@ -70,8 +70,7 @@ namespace GiftTasteHelper.Framework
     #region AllGiftDataProvider 
     internal class AllGiftDataProvider : BaseGiftDataProvider
     {
-        public AllGiftDataProvider(IGiftDatabase database)
-            : base(database)
+        public AllGiftDataProvider(IGiftDatabase database) : base(database)
         {
             var tasteTypes = Enum.GetValues(typeof(GiftTaste)).Cast<GiftTaste>().Where(val => val != GiftTaste.MAX);
             foreach (var giftTaste in Game1.NPCGiftTastes)

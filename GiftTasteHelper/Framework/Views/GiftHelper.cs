@@ -236,7 +236,6 @@ namespace GiftTasteHelper.Framework
                 var texture = ItemRegistry.GetData(item.ID).GetTexture();
                 var tileSheetSourceRect = Game1.getSourceRectForStandardTileSheet(texture, item.SpriteIndex, GiftInfo.IconSize.XInt, GiftInfo.IconSize.YInt);
                 this.DrawText(TokenParser.ParseText(item.DisplayName), textOffset, textColor);
-                // TODO: Fails to draw non item textures (such as books)
                 this.DrawTexture(texture, spriteOffset, tileSheetSourceRect, spriteScale);
                 
 
