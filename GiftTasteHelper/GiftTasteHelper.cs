@@ -112,7 +112,7 @@ namespace GiftTasteHelper
 
                 GiftDatabase = new StoredGiftDatabase(helper, path);
 
-                if (this.ModManifest.Version.IsNewerThan("2.7") && !this.Config.ShareKnownGiftsWithAllSaves)
+                if (!this.Config.ShareKnownGiftsWithAllSaves)
                 {
                     string oldPath = Path.Combine(StoredGiftDatabase.DBRoot, Constants.SaveFolderName, StoredGiftDatabase.DBFileName);
                     string fullOldPath = Path.Combine(helper.DirectoryPath, oldPath);
@@ -123,14 +123,17 @@ namespace GiftTasteHelper
                         StoredGiftDatabase.MigrateDatabase(helper, oldPath, ref dbRef);
                     }
                 }
+
+                dataProvider = new ProgressionGiftDataProvider(GiftDatabase);
+                helper.Events.Input.ButtonPressed += CheckGift_OnButtonPressed;
             }
             else
             {
                 GiftDatabase = new GiftDatabase(helper);
+                dataProvider = new AllGiftDataProvider(GiftDatabase);
+                helper.Events.Input.ButtonPressed -= CheckGift_OnButtonPressed;
             }
 
-            dataProvider = new AllGiftDataProvider(GiftDatabase);
-            helper.Events.Input.ButtonPressed -= CheckGift_OnButtonPressed;
 
             // Add the helpers if they're enabled in config
             CurrentGiftHelper = null;
