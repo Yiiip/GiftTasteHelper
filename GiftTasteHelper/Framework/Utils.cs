@@ -77,7 +77,9 @@ namespace GiftTasteHelper.Framework
             string name = "";
             string[] parts = text.Split('\'', ' ');
             if (parts.Length > 0)
+            {
                 name = parts[0];
+            }
             return name;
         }
 
@@ -95,10 +97,14 @@ namespace GiftTasteHelper.Framework
         public static readonly Dictionary<string, GiftTaste> UniversalTastes = new Dictionary<string, GiftTaste>
         {
             ["Universal_Love"]      = GiftTaste.Love,
+            ["Universal_Loved"]     = GiftTaste.Love,
             ["Universal_Like"]      = GiftTaste.Like,
+            ["Universal_Liked"]     = GiftTaste.Like,
             ["Universal_Neutral"]   = GiftTaste.Neutral,
             ["Universal_Dislike"]   = GiftTaste.Dislike,
-            ["Universal_Hate"]      = GiftTaste.Hate
+            ["Universal_Disliked"]  = GiftTaste.Dislike,
+            ["Universal_Hate"]      = GiftTaste.Hate,
+            ["Universal_Hated"]     = GiftTaste.Hate
         };
 
         public static readonly Dictionary<GiftTaste, string> UniversalTasteNames = new Dictionary<GiftTaste, string>
