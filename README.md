@@ -33,12 +33,10 @@ Also special thanks to PathosChild for help with fixes when I didn't have time a
 ## Contents
 * [Install](#install)
 * [Configure](#configure)
-* [Future features](#future-features)
-* [See also](#see-also)
 
 ## Install
 1. [Install the latest version of SMAPI](https://smapi.io/).
-2. [Install this mod from Nexus mods](http://www.nexusmods.com/stardewvalley/mods/229/).
+2. [Install this mod from Nexus mods or latest release](https://www.nexusmods.com/stardewvalley/mods/21001).
 3. Run the game using SMAPI.
 
 
@@ -60,9 +58,3 @@ setting           | what it affects
 `ColorizeUniversalGiftNames` | Default `false`. Color universal gifts blue.
 `ShowGiftsForUnmetNPCs` | Default `false`. Show gift info for NPCs you haven't met yet.
 
-## Future features
-* Display more than just loved gifts (if I can find a way to do it without cluttering the UI).
-
-## See also
-* [Nexus mod](http://www.nexusmods.com/stardewvalley/mods/229)
-* [Discussion thread](http://community.playstarbound.com/threads/npc-gift-taste-helper.112180/)
