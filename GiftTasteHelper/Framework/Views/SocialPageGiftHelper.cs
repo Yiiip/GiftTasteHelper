@@ -141,8 +141,5 @@ namespace GiftTasteHelper.Framework
             // Listening for when the slot index changes fixes this.
             UpdateHoveredNPC(GetAdjustedCursorPosition(Game1.getMouseX(), Game1.getMouseY()));
         }
-
-        private static SVector2 GetAdjustedCursorPosition(float x, float y)
-            => new SVector2(x, y) * Game1.options.zoomLevel / Game1.options.uiScale;
     }
 }

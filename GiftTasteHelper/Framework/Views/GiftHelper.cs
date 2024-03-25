@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -30,7 +29,7 @@ namespace GiftTasteHelper.Framework
         public bool IsInitialized { get; private set; }
         public bool IsOpen { get; private set; }
         public GiftHelperType GiftHelperType { get; }
-        public float ZoomLevel => 1.0f; // SMAPI's draw call will handle zoom
+        public float UiScale => 1; // SMAPI's draw call will handle scale
 
 
         /*********
@@ -161,7 +160,7 @@ namespace GiftTasteHelper.Framework
                 maxNameSize = Utils.CreateMax(maxNameSize, drawData.Gifts[i].Item.NameSize);
             }
 
-            float spriteScale = 2.0f * this.ZoomLevel; // 16x16 is pretty small
+            float spriteScale = 2.0f * this.UiScale; // 16x16 is pretty small
             SVector2 spriteSize = numItemsToDraw > 0 ? GiftInfo.IconSize : SVector2.Zero; // We just need the dimensions which we assume are all the same
             SVector2 scaledSpriteSize = spriteSize * spriteScale;
 
@@ -172,12 +171,12 @@ namespace GiftTasteHelper.Framework
             SVector2 mouse = new SVector2(Game1.getOldMouseX(), Game1.getOldMouseY());
 
             int padding = 4; // Chosen by fair dice roll
-            int rowHeight = (int)Math.Max(maxTextSize.Y * this.ZoomLevel, scaledSpriteSize.YInt) + padding;
-            int columnWidth = this.AdjustForTileSize((maxTextSize.X * this.ZoomLevel) + scaledSpriteSize.XInt) + padding;
-            int width = this.AdjustForTileSize((maxTextSize.X * this.ZoomLevel) + scaledSpriteSize.XInt) + padding;
+            int rowHeight = (int)Math.Max(maxTextSize.Y * this.UiScale, scaledSpriteSize.YInt) + padding;
+            int columnWidth = this.AdjustForTileSize((maxTextSize.X * this.UiScale) + scaledSpriteSize.XInt) + padding;
+            int width = this.AdjustForTileSize((maxTextSize.X * this.UiScale) + scaledSpriteSize.XInt) + padding;
             int height = this.AdjustForTileSize(rowHeight * (numItemsToDraw + 1)); // Add one to make room for the title
-            int x = this.AdjustForTileSize(mouse.X, 0.5f, this.ZoomLevel);
-            int y = this.AdjustForTileSize(mouse.Y, 0.5f, this.ZoomLevel);
+            int x = this.AdjustForTileSize(mouse.X, 0.5f, this.UiScale);
+            int y = this.AdjustForTileSize(mouse.Y, 0.5f, this.UiScale);
 
             int viewportW = (int)(Game1.viewport.Width * Game1.options.zoomLevel / Game1.options.uiScale);
             int viewportH = (int)(Game1.viewport.Height * Game1.options.zoomLevel / Game1.options.uiScale);
@@ -189,7 +188,7 @@ namespace GiftTasteHelper.Framework
                 height = this.AdjustForTileSize(rowHeight * (numItemsPerColumn + 1));
 
                 int columnsToDraw = (numItemsToDraw - 1) / numItemsPerColumn + 1;
-                width = (this.AdjustForTileSize((maxTextSize.X * this.ZoomLevel) + scaledSpriteSize.XInt) + padding) * columnsToDraw;
+                width = (this.AdjustForTileSize((maxTextSize.X * this.UiScale) + scaledSpriteSize.XInt) + padding) * columnsToDraw;
             }
 
             // Let derived classes adjust the positioning
@@ -198,7 +197,7 @@ namespace GiftTasteHelper.Framework
             // Approximate where the original tooltip will be positioned if there is an existing one we need to account for
             this.OrigHoverTextSize = SVector2.MeasureString(originalTooltipText, Game1.dialogueFont);
             int origTToffsetX = this.OrigHoverTextSize.X > 0
-                ? Math.Max(0, this.AdjustForTileSize(this.OrigHoverTextSize.X + mouse.X, 1.0f) - viewportW) + width
+                ? Math.Max(0, this.AdjustForTileSize(this.OrigHoverTextSize.X + mouse.X, this.UiScale) - viewportW) + width
                 : 0;
 
             // Consider the position of the original tooltip and ensure we don't cover it up
@@ -209,7 +208,7 @@ namespace GiftTasteHelper.Framework
 
             // Part of the spritesheet containing the texture we want to draw
             Rectangle menuTextureSourceRect = new Rectangle(0, 256, 60, 60);
-            IClickableMenu.drawTextureBox(spriteBatch, Game1.menuTexture, menuTextureSourceRect, tooltipPos.XInt, tooltipPos.YInt, width, height, Color.White, this.ZoomLevel);
+            IClickableMenu.drawTextureBox(spriteBatch, Game1.menuTexture, menuTextureSourceRect, tooltipPos.XInt, tooltipPos.YInt, width, height, Color.White, this.UiScale);
 
             // Offset the sprite from the corner of the bg, and the text to the right and centered vertically of the sprite
             SVector2 spriteOffset = new SVector2(this.AdjustForTileSize(tooltipPos.X, 0.25f), this.AdjustForTileSize(tooltipPos.Y, 0.25f));
@@ -274,7 +273,7 @@ namespace GiftTasteHelper.Framework
 
         private void DrawText(string text, SVector2 pos, Color textColor)
         {
-            Game1.spriteBatch.DrawString(Game1.smallFont, text, pos.ToVector2(), textColor, 0.0f, Vector2.Zero, this.ZoomLevel, SpriteEffects.None, 0.0f);
+            Game1.spriteBatch.DrawString(Game1.smallFont, text, pos.ToVector2(), textColor, 0.0f, Vector2.Zero, this.UiScale, SpriteEffects.None, 0.0f);
         }
 
         private void DrawTexture(Texture2D texture, SVector2 pos, Rectangle source, float scale = 1.0f)
@@ -315,6 +314,9 @@ namespace GiftTasteHelper.Framework
             return Math.Max(0, ca);
         }
         #endregion Drawing
+
+        protected static SVector2 GetAdjustedCursorPosition(float x, float y)
+            => new SVector2(x, y) * Game1.options.zoomLevel / Game1.options.uiScale;
     }
 
 }

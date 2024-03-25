@@ -95,7 +95,7 @@ namespace GiftTasteHelper.Framework
             Debug.Assert(this.Calendar.IsOpen, "OnCursorMoved being called but the calendar isn't open");
 
             // This gets the scaled mouse position
-            SVector2 mouse = new SVector2(e.NewPosition.ScreenPixels.X, e.NewPosition.ScreenPixels.Y);
+            SVector2 mouse = GetAdjustedCursorPosition(e.NewPosition.ScreenPixels.X, e.NewPosition.ScreenPixels.Y);
 
             int hoveredDay = this.Calendar.GetHoveredDayIndex(mouse) + 1; // Days start at one
             if (hoveredDay == this.HoveredDay)
