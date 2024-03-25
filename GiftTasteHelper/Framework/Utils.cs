@@ -138,12 +138,12 @@ namespace GiftTasteHelper.Framework
         // See http://stardewvalleywiki.com/Modding:Gift_taste_data
         public static GiftTaste GetTasteForGift(string npcName, string itemId)
         {
-            if (!Game1.NPCGiftTastes.ContainsKey(npcName))
+            if (npcName is null || !Game1.NPCGiftTastes.TryGetValue(npcName, out var giftTastesRaw))
             {
                 return GiftTaste.MAX;
             }
 
-            if (!Game1.objectData.ContainsKey(itemId))
+            if (itemId is null || !Game1.objectData.ContainsKey(itemId))
             {
                 // Item is likely a category
                 return GiftTaste.MAX;
@@ -151,7 +151,7 @@ namespace GiftTasteHelper.Framework
 
             GiftTaste taste = GiftTaste.Neutral;
 
-            string[] giftTastes = Game1.NPCGiftTastes[npcName].Split('/');
+            string[] giftTastes = giftTastesRaw.Split('/');
             Debug.Assert(giftTastes.Length > 0);
             if (giftTastes.Length == 0)
             {
@@ -224,11 +224,11 @@ namespace GiftTasteHelper.Framework
                 [9] = GiftTaste.Neutral
             };
 
-            foreach (var (Key, Value) in personalMetadataKeys)
+            foreach (var (tasteIndex, Value) in personalMetadataKeys)
             {
-                if (giftTastes[Key].Length > 0)
+                if (tasteIndex < giftTastes.Length && giftTastes[tasteIndex].Length > 0)
                 {
-                    var items = giftTastes[Key].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    var items = giftTastes[tasteIndex].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                     bool hasTasteForItemOrCategory = items.Contains(itemData.ID) || (itemData.Category.Valid && items.Contains(itemData.Category.ID));
                     bool noCategoryOrNoTasteForCategory = !itemData.Category.Valid || !items.Contains(itemData.Category.ID);

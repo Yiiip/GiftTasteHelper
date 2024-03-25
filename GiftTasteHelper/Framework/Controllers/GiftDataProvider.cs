@@ -40,10 +40,7 @@ namespace GiftTasteHelper.Framework
     #region ProgressionGiftDataProvider
     internal class ProgressionGiftDataProvider : BaseGiftDataProvider
     {
-        public ProgressionGiftDataProvider(IGiftDatabase database)
-            : base(database)
-        {
-        }
+        public ProgressionGiftDataProvider(IGiftDatabase database) : base(database) { }
 
         public override IEnumerable<string> GetGifts(string npcName, GiftTaste taste, bool includeUniversal)
         {

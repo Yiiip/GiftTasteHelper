@@ -60,6 +60,6 @@ namespace GiftTasteHelper.Framework
         public static readonly ISemanticVersion CurrentVersion = new SemanticVersion("1.0");
 
         public ISemanticVersion Version { get; set; } = new SemanticVersion("1.0");
-        public Dictionary<string, CharacterTasteModel> Entries { get; set; } = new Dictionary<string, CharacterTasteModel>();
+        public Dictionary<string, CharacterTasteModel> Entries { get; set; } = new();
     }
 }
