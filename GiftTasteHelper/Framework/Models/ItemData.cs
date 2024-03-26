@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.GameData.Objects;
+using StardewValley.TokenizableStrings;
 
 namespace GiftTasteHelper.Framework
 {
@@ -68,17 +68,17 @@ namespace GiftTasteHelper.Framework
             }
 
             ObjectData objectInfo = Game1.objectData[itemId];
-
+            string tokenizedName = TokenParser.ParseText(objectInfo.DisplayName);
             return new ItemData
             {
                 Name = objectInfo.Name,
-                DisplayName = objectInfo.DisplayName,
+                DisplayName = tokenizedName,
                 Price = objectInfo.Price,
                 Edibility = objectInfo.Edibility,
                 ID = itemId,
                 Category = ItemData.GetCategory(itemId),
                 SpriteIndex = objectInfo.SpriteIndex,
-                NameSize = SVector2.MeasureString(objectInfo.DisplayName, Game1.smallFont)
+                NameSize = SVector2.MeasureString(tokenizedName, Game1.smallFont)
             };
         }
 

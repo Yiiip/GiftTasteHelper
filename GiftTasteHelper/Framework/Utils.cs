@@ -116,6 +116,16 @@ namespace GiftTasteHelper.Framework
             [GiftTaste.Hate]        = "Universal_Hate"
         };
 
+        public static readonly Dictionary<int, GiftTaste> TasteIndexMap = new Dictionary<int, GiftTaste>
+        {
+            // metadata is paired: odd values contain a list of item references, even values contain the reaction dialogue
+            [1] = GiftTaste.Love,
+            [7] = GiftTaste.Hate, // Hate has precedence
+            [3] = GiftTaste.Like,
+            [5] = GiftTaste.Dislike,
+            [9] = GiftTaste.Neutral
+        };
+
         public static string[] GetItemsForTaste(string npcName, GiftTaste taste)
         {
             Debug.Assert(taste != GiftTaste.MAX);
@@ -131,14 +141,27 @@ namespace GiftTasteHelper.Framework
             }
 
             // See http://stardewvalleywiki.com/Modding:Gift_taste_data
-            int tasteIndex = (int)taste + 1; // Enum value is the even number which is the dialogue, odd is the list of item refs.
+            // Enum value is the even number which is the dialogue, odd is the list of item refs.
+            int tasteIndex = (int)taste + 1;
             string[] giftTastes = giftTaste.Split('/');
-            if (giftTastes.Length > tasteIndex && giftTastes[tasteIndex].Length > 0)
+            if (tasteIndex < giftTastes.Length && giftTastes[tasteIndex].Length > 0)
             {
                 return giftTastes[tasteIndex].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             }
 
             return Array.Empty<string>();
+        }
+
+        private static GiftTaste GetUniversalTaste(string id, GiftTaste fallback = GiftTaste.MAX)
+        {
+            foreach (var (Key, Value) in UniversalTastes)
+            {
+                if (GetItemsForTaste(Key, Value).Contains(id))
+                {
+                    return Value;
+                }
+            }
+            return fallback;
         }
 
         // See http://stardewvalleywiki.com/Modding:Gift_taste_data
@@ -158,53 +181,25 @@ namespace GiftTasteHelper.Framework
             GiftTaste taste = GiftTaste.Neutral;
 
             string[] giftTastes = giftTastesRaw.Split('/');
-            Debug.Assert(giftTastes.Length > 0);
             if (giftTastes.Length == 0)
             {
+                Debug.Fail($"Invalid gift taste! npcName = {npcName}, itemId = {itemId}");
                 return taste;
             }
 
             var itemData = ItemData.MakeItem(itemId);
 
-            // Part I: universal taste by category
-            GiftTaste UniversalTasteForCategory(string cat)
-            {
-                foreach (var (Key, Value) in UniversalTastes)
-                {
-                    if (GetItemsForTaste(Key, Value).Contains(cat))
-                    {
-                        return Value;
-                    }
-                }
-                return GiftTaste.Neutral;
-            }
-
             if (itemData.Category.Valid)
             {
-                taste = UniversalTasteForCategory(itemData.Category.ID);
-            }
-
-            // Part II: universal taste by item ID
-            GiftTaste GetUniversalTaste(string id)
-            {
-                foreach (var (Key, Value) in UniversalTastes)
-                {
-                    if (GetItemsForTaste(Key, Value).Contains(id))
-                    {
-                        return Value;
-                    }
-                }
-                return GiftTaste.MAX;
+                taste = GetUniversalTaste(itemData.Category.ID, GiftTaste.Neutral);
             }
 
             var universalTaste = GetUniversalTaste(itemData.ID);
             bool hasUniversalId = universalTaste != GiftTaste.MAX;
-            bool hasUniversalNeutralId = universalTaste == GiftTaste.Neutral;
-            taste = universalTaste != GiftTaste.MAX ? universalTaste : taste;
 
-            // Part III: override neutral if it's from universal category
-            if (taste == GiftTaste.Neutral && !hasUniversalNeutralId)
+            if (taste == GiftTaste.Neutral && universalTaste != GiftTaste.Neutral)
             {
+                // Part III: override neutral if it's from universal category
                 if (itemData.Edible && itemData.TastesBad)
                 {
                     taste = GiftTaste.Hate;
@@ -217,20 +212,14 @@ namespace GiftTasteHelper.Framework
                 {
                     taste = npcName == "Penny" ? GiftTaste.Like : GiftTaste.Dislike;
                 }
+                else if (hasUniversalId)
+                {
+                    taste = universalTaste;
+                }
             }
 
             // part IV: sometimes override with personal tastes
-            var personalMetadataKeys = new Dictionary<int, GiftTaste>
-            {
-                // metadata is paired: odd values contain a list of item references, even values contain the reaction dialogue
-                [1] = GiftTaste.Love,
-                [7] = GiftTaste.Hate, // Hate has precedence
-                [3] = GiftTaste.Like,
-                [5] = GiftTaste.Dislike,
-                [9] = GiftTaste.Neutral
-            };
-
-            foreach (var (tasteIndex, Value) in personalMetadataKeys)
+            foreach (var (tasteIndex, Value) in TasteIndexMap)
             {
                 if (tasteIndex < giftTastes.Length && giftTastes[tasteIndex].Length > 0)
                 {

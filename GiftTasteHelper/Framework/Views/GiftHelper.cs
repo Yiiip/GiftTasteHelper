@@ -29,7 +29,7 @@ namespace GiftTasteHelper.Framework
         public bool IsInitialized { get; private set; }
         public bool IsOpen { get; private set; }
         public GiftHelperType GiftHelperType { get; }
-        public float UiScale => 1; // SMAPI's draw call will handle scale
+        public float UiScale => 1f; // SMAPI's draw call will handle scale
 
 
         /*********
@@ -234,7 +234,7 @@ namespace GiftTasteHelper.Framework
                 var textColor = gift.Universal && this.GiftConfig.ColorizeUniversalGiftNames ? Color.Blue : Game1.textColor;
                 var texture = ItemRegistry.GetData(item.ID).GetTexture();
                 var tileSheetSourceRect = Game1.getSourceRectForStandardTileSheet(texture, item.SpriteIndex, GiftInfo.IconSize.XInt, GiftInfo.IconSize.YInt);
-                this.DrawText(TokenParser.ParseText(item.DisplayName), textOffset, textColor);
+                this.DrawText(item.DisplayName, textOffset, textColor);
                 this.DrawTexture(texture, spriteOffset, tileSheetSourceRect, spriteScale);
                 
 
