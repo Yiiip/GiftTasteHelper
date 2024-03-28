@@ -79,6 +79,10 @@ namespace GiftTasteHelper
             {
                 action.Invoke(value);
                 Utils.DebugLog("Reloading gift helpers");
+                // Unsubscripe from events that may be subscribed to in LoadGiftHelpers
+                Helper.Events.Input.ButtonPressed -= CheckGift_OnButtonPressed;
+                Helper.Events.Display.MenuChanged -= OnMenuChanged;
+
                 LoadGiftHelpers(Helper);
                 this.ReloadHelpers = false;
             });
