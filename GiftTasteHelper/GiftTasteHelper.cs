@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using GenericModConfigMenu;
@@ -74,6 +73,17 @@ namespace GiftTasteHelper
             }
         }
 
+        private Action<T> RebuildDatabaseAfterAction<T>(Action<T> action)
+        {
+            return new Action<T>(value =>
+            {
+                action.Invoke(value);
+                Utils.DebugLog("Reloading gift helpers");
+                LoadGiftHelpers(Helper);
+                this.ReloadHelpers = false;
+            });
+        }
+
         private void RegisterConfigMenu(object sender, GameLaunchedEventArgs e)
         {
             // get Generic Mod Config Menu's API (if it's installed)
@@ -91,14 +101,14 @@ namespace GiftTasteHelper
             configMenu.AddSectionTitle(
                 mod: this.ModManifest,
                 text: () => Helper.Translation.Get("options.display")
-                );
+            );
 
             configMenu.AddBoolOption(
                 mod: this.ModManifest,
                 name: () => Helper.Translation.Get("options.showOnCalendar"),
                 tooltip: () => Helper.Translation.Get("options.showOnCalendar.desc"),
                 getValue: () => this.Config.ShowOnCalendar,
-                setValue: value => this.Config.ShowOnCalendar = value
+                setValue: RebuildDatabaseAfterAction<bool>(value => this.Config.ShowOnCalendar = value)
             );
 
             configMenu.AddBoolOption(
@@ -106,7 +116,7 @@ namespace GiftTasteHelper
                 name: () => Helper.Translation.Get("options.showOnSocialPage"),
                 tooltip: () => Helper.Translation.Get("options.showOnSocialPage.desc"),
                 getValue: () => this.Config.ShowOnSocialPage,
-                setValue: value => this.Config.ShowOnSocialPage = value
+                setValue: RebuildDatabaseAfterAction<bool>(value => this.Config.ShowOnSocialPage = value)
             );
 
             configMenu.AddBoolOption(
@@ -114,7 +124,7 @@ namespace GiftTasteHelper
                 name: () => Helper.Translation.Get("options.showOnlyKnownGifts"),
                 tooltip: () => Helper.Translation.Get("options.showOnlyKnownGifts.desc"),
                 getValue: () => this.Config.ShowOnlyKnownGifts,
-                setValue: value => this.Config.ShowOnlyKnownGifts = value
+                setValue: RebuildDatabaseAfterAction<bool>(value => this.Config.ShowOnlyKnownGifts = value)
             );
 
             configMenu.AddBoolOption(
@@ -169,7 +179,7 @@ namespace GiftTasteHelper
                 name: () => Helper.Translation.Get("options.shareKnownGiftsWithAllSaves"),
                 tooltip: () => Helper.Translation.Get("options.shareKnownGiftsWithAllSaves.desc"),
                 getValue: () => this.Config.ShareKnownGiftsWithAllSaves,
-                setValue: value => this.Config.ShareKnownGiftsWithAllSaves = value
+                setValue: RebuildDatabaseAfterAction<bool>(value => this.Config.ShareKnownGiftsWithAllSaves = value)
             );
         }
 
@@ -374,9 +384,9 @@ namespace GiftTasteHelper
         /// <param name="e">The event data.</param>
         private void OnCursorMoved(object sender, CursorMovedEventArgs e)
         {
-            Debug.Assert(this.CurrentGiftHelper != null, "OnCursorMoved listener invoked when currentGiftHelper is null.");
+            // Debug.Assert(this.CurrentGiftHelper != null, "OnCursorMoved listener invoked when currentGiftHelper is null.");
 
-            if (this.CurrentGiftHelper.CanTick())
+            if (this.CurrentGiftHelper != null && this.CurrentGiftHelper.CanTick())
             {
                 this.CurrentGiftHelper.OnCursorMoved(e);
             }
@@ -387,9 +397,9 @@ namespace GiftTasteHelper
         /// <param name="e">The event data.</param>
         private void OnRendered(object sender, RenderedActiveMenuEventArgs e)
         {
-            Debug.Assert(this.CurrentGiftHelper != null, "OnPostRenderEvent listener invoked when currentGiftHelper is null.");
+            // Debug.Assert(this.CurrentGiftHelper != null, "OnPostRenderEvent listener invoked when currentGiftHelper is null.");
 
-            if (this.CurrentGiftHelper.CanDraw())
+            if (this.CurrentGiftHelper != null && this.CurrentGiftHelper.CanDraw())
             {
                 this.CurrentGiftHelper.OnDraw();
             }
@@ -397,9 +407,9 @@ namespace GiftTasteHelper
 
         private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            Debug.Assert(this.CurrentGiftHelper != null, "OnUpdateTicked listener invoked when currentGiftHelper is null.");
+            // Debug.Assert(this.CurrentGiftHelper != null, "OnUpdateTicked listener invoked when currentGiftHelper is null.");
 
-            if (this.CurrentGiftHelper.CanTick())
+            if (this.CurrentGiftHelper != null && this.CurrentGiftHelper.CanTick())
             {
                 this.CurrentGiftHelper.OnPostUpdate(e);
             }
@@ -417,7 +427,7 @@ namespace GiftTasteHelper
             Helper.Events.Input.CursorMoved += OnCursorMoved;
             Helper.Events.Display.RenderedActiveMenu += this.OnRendered;
 
-            if (this.CurrentGiftHelper.WantsUpdateEvent())
+            if (this.CurrentGiftHelper != null && this.CurrentGiftHelper.WantsUpdateEvent())
             {
                 Helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
             }
