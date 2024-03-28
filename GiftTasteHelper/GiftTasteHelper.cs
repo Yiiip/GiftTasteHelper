@@ -384,6 +384,7 @@ namespace GiftTasteHelper
         /// <param name="e">The event data.</param>
         private void OnCursorMoved(object sender, CursorMovedEventArgs e)
         {
+            // This is now supported after changing settings in-game
             // Debug.Assert(this.CurrentGiftHelper != null, "OnCursorMoved listener invoked when currentGiftHelper is null.");
 
             if (this.CurrentGiftHelper != null && this.CurrentGiftHelper.CanTick())
@@ -397,6 +398,7 @@ namespace GiftTasteHelper
         /// <param name="e">The event data.</param>
         private void OnRendered(object sender, RenderedActiveMenuEventArgs e)
         {
+            // This is now supported after changing settings in-game
             // Debug.Assert(this.CurrentGiftHelper != null, "OnPostRenderEvent listener invoked when currentGiftHelper is null.");
 
             if (this.CurrentGiftHelper != null && this.CurrentGiftHelper.CanDraw())
@@ -407,6 +409,7 @@ namespace GiftTasteHelper
 
         private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
+            // This is now supported after changing settings in-game
             // Debug.Assert(this.CurrentGiftHelper != null, "OnUpdateTicked listener invoked when currentGiftHelper is null.");
 
             if (this.CurrentGiftHelper != null && this.CurrentGiftHelper.CanTick())
