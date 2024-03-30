@@ -58,22 +58,37 @@ namespace GiftTasteHelper.Framework
                 return null;
             }
 
-            IEnumerable<GiftInfo> MakeGifts(Dictionary<GiftTaste, ItemData[]> allGifts, bool universal = false)
-            {
-                return tastesToDisplay
-                .SelectMany(taste => allGifts[taste]
-                .Select(item => new GiftInfo() { Item = item, Taste = taste, Universal = universal }))
-                .OrderBy(gift => gift.Item.Name);
-            }
-
-            NpcGiftInfo infoForNpc = NpcGiftInfo[npcName];
             return new GiftDrawData(npcName)
             {
-                Gifts = (includeUniversal
-                ? MakeGifts(infoForNpc.UniversalGifts, true).Concat(MakeGifts(infoForNpc.Gifts))
-                : MakeGifts(infoForNpc.Gifts))
-                .ToArray()
+                Gifts = GetGiftsOfTaste(npcName, tastesToDisplay, includeUniversal).ToArray()
             };
+        }
+
+        private IEnumerable<GiftInfo> GetGiftsOfTaste(string npcName, GiftTaste[] tastes, bool includeUniversal)
+        {
+            NpcGiftInfo infoForNpc = NpcGiftInfo[npcName];
+            if (includeUniversal)
+            {
+                foreach (var taste in tastes)
+                {
+                    foreach (var gift in infoForNpc.UniversalGifts[taste].OrderBy(x => x.Name))
+                    {
+                        // Allow npc gift tastes override universal gift tastes
+                        if (!infoForNpc.Gifts.Any(pair => pair.Key != GiftTaste.Neutral && pair.Value.Contains(gift)))
+                        {
+                            yield return new GiftInfo() { Item = gift, Taste = taste, Universal = true };
+                        }
+                    }
+                }
+            }
+
+            foreach (var taste in tastes)
+            {
+                foreach (var gift in infoForNpc.Gifts[taste].OrderBy(x => x.Name))
+                {
+                    yield return new GiftInfo() { Item = gift, Taste = taste, Universal = false };
+                }
+            }
         }
 
         private void BuildGiftData()
