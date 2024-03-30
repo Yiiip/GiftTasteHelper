@@ -21,6 +21,7 @@ namespace GiftTasteHelper.Framework
         bool OnOpen(IClickableMenu menu);
         void OnResize(IClickableMenu menu);
         void OnClose();
+        void OnConsoleNavigate();
 
         /// <summary>Should this helper recieve OnDraw events.</summary>
         bool CanDraw();

@@ -291,7 +291,9 @@ namespace GiftTasteHelper
             // trick to do the check if the gift was given. Since a dialogue is always opened after giving a gift
             // the user has to press something to proceed so it's during that input that we'll do the check (if the flag is set).
             if (this.CheckGiftGivenNextInput)
+            {
                 this.GiftMonitor.CheckGiftGiven();
+            }
 
             switch (e.Button)
             {
@@ -307,6 +309,11 @@ namespace GiftTasteHelper
                 case SButton.MouseRight:
                     this.GiftMonitor.UpdateHeldGift();
                     break;
+
+                case SButton.LeftTrigger or SButton.RightTrigger:
+                    CurrentGiftHelper?.OnConsoleNavigate();
+                    break;
+
             }
         }
         #endregion Gift Monitor Handling

@@ -79,6 +79,11 @@ namespace GiftTasteHelper.Framework
             this.IsOpen = false;
         }
 
+        public virtual void OnConsoleNavigate()
+        {
+
+        }
+
         public virtual bool CanTick()
         {
             return true;
@@ -317,6 +322,7 @@ namespace GiftTasteHelper.Framework
 
         protected static SVector2 GetAdjustedCursorPosition(float x, float y)
             => new SVector2(x, y) * Game1.options.zoomLevel / Game1.options.uiScale;
+
     }
 
 }

@@ -34,7 +34,9 @@ namespace GiftTasteHelper.Framework
 
             SDVSocialPage nativeSocialPage = this.GetNativeSocialPage(menu);
             if (nativeSocialPage != null)
+            {
                 this.SocialPage.Init(nativeSocialPage, this.Reflection);
+            }
             return base.OnOpen(menu);
         }
 
@@ -44,10 +46,22 @@ namespace GiftTasteHelper.Framework
             this.SocialPage.OnResize(this.GetNativeSocialPage(menu));
         }
 
+        public override void OnConsoleNavigate()
+        {
+            if (IsOpen && !IsCorrectMenuTab(Game1.activeClickableMenu))
+            {
+                this.OnClose();
+            }
+            else if (!IsOpen && IsCorrectMenuTab(Game1.activeClickableMenu))
+            {
+                this.OnOpen(Game1.activeClickableMenu);
+            }
+        }
+
         public override bool CanTick()
         {
             // we don't have a tab-changed event so don't tick when the social tab isn't open
-            return this.IsCorrectMenuTab(Game1.activeClickableMenu) && base.CanTick();
+            return base.CanTick() && this.IsCorrectMenuTab(Game1.activeClickableMenu);
         }
 
         public override void OnCursorMoved(CursorMovedEventArgs e)
@@ -78,16 +92,14 @@ namespace GiftTasteHelper.Framework
         {
             // Prevent the tooltip from going off screen if we're at the edge
             if (x + width > viewportW)
+            {
                 x = viewportW - width;
+            }
         }
 
         private bool IsCorrectMenuTab(IClickableMenu menu)
         {
-            if (menu is GameMenu gameMenu)
-            {
-                return gameMenu.currentTab == GameMenu.socialTab;
-            }
-            return false;
+            return menu is GameMenu gameMenu && gameMenu.currentTab == GameMenu.socialTab;
         }
 
         private SDVSocialPage GetNativeSocialPage(IClickableMenu menu)
