@@ -34,7 +34,9 @@ namespace GiftTasteHelper.Framework
 
             SDVSocialPage nativeSocialPage = this.GetNativeSocialPage(menu);
             if (nativeSocialPage != null)
+            {
                 this.SocialPage.Init(nativeSocialPage, this.Reflection);
+            }
             return base.OnOpen(menu);
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using StardewModdingAPI;
+using StardewValley;
 
 namespace GiftTasteHelper.Framework
 {
@@ -55,7 +56,7 @@ namespace GiftTasteHelper.Framework
                 Utils.DebugLog($"Adding {itemId} to {npcName}'s {taste} tastes.");
                 Database.Entries[npcName].Add(taste, new GiftModel() { ItemId = itemId });
 
-                DatabaseChanged();
+                DatabaseChanged?.Invoke();
                 return true;
             }
             return false;
@@ -76,10 +77,10 @@ namespace GiftTasteHelper.Framework
 
             // Add only the gifts that are not already in the DB.
             var unique = itemIds.Where(id => !ContainsGift(npcName, id, taste)).Select(id => id);
-            if (unique.Count() > 0)
+            if (unique.Any())
             {
                 Database.Entries[npcName].AddRange(taste, itemIds.Select(id => new GiftModel() { ItemId = id }));
-                DatabaseChanged();
+                DatabaseChanged?.Invoke();
                 return true;
             }
             return false;
@@ -106,7 +107,7 @@ namespace GiftTasteHelper.Framework
         public static string DBRoot => "DB";
         public static string DBFileName => "GiftDatabase.json";
 
-        private string DBPath;
+        private readonly string DBPath;
 
         public StoredGiftDatabase(IModHelper helper, string path)
             : base(helper, helper.Data.ReadJsonFile<GiftDatabaseModel>(path) ?? new GiftDatabaseModel())
@@ -122,6 +123,44 @@ namespace GiftTasteHelper.Framework
                 Utils.DebugLog($"Upgrading DB version from {this.Database.Version} to {GiftDatabaseModel.CurrentVersion}", LogLevel.Info);
                 this.Database.Version = GiftDatabaseModel.CurrentVersion;
                 Write();
+            }
+
+            // Load existing gift data.
+            AddSaveGameGifts();
+        }
+
+        private void AddSaveGameGifts()
+        {
+            foreach (var npcName in Game1.NPCGiftTastes.Keys)
+            {
+                if (!Game1.player.giftedItems.ContainsKey(npcName))
+                {
+                    continue;
+                }
+
+                var tasteItems = new Dictionary<GiftTaste, List<string>>();
+                foreach (var item in Game1.player.giftedItems[npcName].Keys)
+                {
+                    var taste = Utils.GetTasteForGift(npcName, item);
+                    if (taste is GiftTaste.MAX)
+                    {
+                        continue;
+                    }
+
+                    if (tasteItems.TryGetValue(taste, out var tastes))
+                    {
+                        tastes.Add(item);
+                    }
+                    else
+                    {
+                        tasteItems[taste] = new List<string> { item };
+                    }
+                }
+
+                foreach (var (taste, gifts) in tasteItems)
+                {
+                    AddGifts(npcName, taste, gifts.ToArray());
+                }
             }
         }
 

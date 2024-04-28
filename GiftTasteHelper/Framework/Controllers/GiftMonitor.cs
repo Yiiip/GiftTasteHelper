@@ -9,7 +9,7 @@ namespace GiftTasteHelper.Framework
     {
         public event GiftGivenDelegate GiftGiven;
 
-        private StardewValley.Object ActiveObject => Game1.player.ActiveObject;
+        private Object ActiveObject => Game1.player.ActiveObject;
         private uint GiftsGiven => Game1.stats.GiftsGiven;
 
         // 0 = Friendship level
@@ -23,7 +23,7 @@ namespace GiftTasteHelper.Framework
         // Last known number of gifts given so we can check when the stat value changes.
         private uint PriorGiftsGiven;
         // Currently held gift.
-        private StardewValley.Object HeldGift;
+        private Object HeldGift;
         // Last known state of which npc's have been given gifts. Must be reset when the day changes.
         private Dictionary<string, bool> GiftsGivenToday;
 

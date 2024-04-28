@@ -66,15 +66,34 @@ namespace GiftTasteHelper.Framework
 
         private IEnumerable<GiftInfo> GetGiftsOfTaste(string npcName, GiftTaste[] tastes, bool includeUniversal)
         {
+
             NpcGiftInfo infoForNpc = NpcGiftInfo[npcName];
             if (includeUniversal)
             {
+
+                IEnumerable<string> GetExcludes()
+                {
+                    foreach (var (taste, items) in infoForNpc.Gifts)
+                    {
+                        if (taste is GiftTaste.Neutral)
+                        {
+                            continue;
+                        }
+
+                        foreach (var item in items)
+                        {
+                            yield return item.ID;
+                        }
+                    }
+                }
+
+                var excludes = new HashSet<string>(GetExcludes());
                 foreach (var taste in tastes)
                 {
                     foreach (var gift in infoForNpc.UniversalGifts[taste].OrderBy(x => x.Name))
                     {
                         // Allow npc gift tastes override universal gift tastes
-                        if (!infoForNpc.Gifts.Any(pair => pair.Key != GiftTaste.Neutral && pair.Value.Contains(gift)))
+                        if (!excludes.Contains(gift.ID))
                         {
                             yield return new GiftInfo() { Item = gift, Taste = taste, Universal = true };
                         }

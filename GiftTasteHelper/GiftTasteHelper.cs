@@ -78,13 +78,11 @@ namespace GiftTasteHelper
             return new Action<T>(value =>
             {
                 action.Invoke(value);
-                Utils.DebugLog("Reloading gift helpers");
-                // Unsubscripe from events that may be subscribed to in LoadGiftHelpers
-                Helper.Events.Input.ButtonPressed -= CheckGift_OnButtonPressed;
-                Helper.Events.Display.MenuChanged -= OnMenuChanged;
-
-                LoadGiftHelpers(Helper);
-                this.ReloadHelpers = false;
+                Shutdown();
+                if (Context.IsWorldReady)
+                {
+                    Initialize();
+                }
             });
         }
 
@@ -93,7 +91,9 @@ namespace GiftTasteHelper
             // get Generic Mod Config Menu's API (if it's installed)
             var configMenu = this.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (configMenu is null)
+            {
                 return;
+            }
 
             // register mod
             configMenu.Register(
@@ -229,13 +229,17 @@ namespace GiftTasteHelper
 
                 if (!this.Config.ShareKnownGiftsWithAllSaves)
                 {
-                    string oldPath = Path.Combine(StoredGiftDatabase.DBRoot, Constants.SaveFolderName, StoredGiftDatabase.DBFileName);
-                    string fullOldPath = Path.Combine(helper.DirectoryPath, oldPath);
-                    if (File.Exists(fullOldPath))
+                    var folderName = Constants.SaveFolderName;
+                    if (folderName is not null)
                     {
-                        Utils.DebugLog($"Found old DB at {oldPath}. Migrating to {path}.", LogLevel.Info);
-                        StoredGiftDatabase dbRef = (StoredGiftDatabase)GiftDatabase;
-                        StoredGiftDatabase.MigrateDatabase(helper, oldPath, ref dbRef);
+                        string oldPath = Path.Combine(StoredGiftDatabase.DBRoot, folderName, StoredGiftDatabase.DBFileName);
+                        string fullOldPath = Path.Combine(helper.DirectoryPath, oldPath);
+                        if (File.Exists(fullOldPath))
+                        {
+                            Utils.DebugLog($"Found old DB at {oldPath}. Migrating to {path}.", LogLevel.Info);
+                            StoredGiftDatabase dbRef = (StoredGiftDatabase)GiftDatabase;
+                            StoredGiftDatabase.MigrateDatabase(helper, oldPath, ref dbRef);
+                        }
                     }
                 }
 
@@ -291,7 +295,9 @@ namespace GiftTasteHelper
             // trick to do the check if the gift was given. Since a dialogue is always opened after giving a gift
             // the user has to press something to proceed so it's during that input that we'll do the check (if the flag is set).
             if (this.CheckGiftGivenNextInput)
+            {
                 this.GiftMonitor.CheckGiftGiven();
+            }
 
             switch (e.Button)
             {
@@ -499,18 +505,20 @@ namespace GiftTasteHelper
                 }
                 Game1.warpFarmer(location, x / Game1.tileSize, y / Game1.tileSize, false);
             });
-            /*
+
             helper.ConsoleCommands.Add("setup", "", (name, args) =>
             {
-                helper.ConsoleCommands.Trigger("world_settime", new string[] { "1000" });
-                helper.ConsoleCommands.Trigger("teleport", new string[] { "SamHouse", "306", "339" });
-                var items = new int[] { 74, 773, 417, 324, 92, 220, 176, 417, 404, 22, 18 }; // Test items for all of jodi's tastes.
+                Game1.timeOfDay = 1000;
+                Game1.warpFarmer("SamHouse", 306, 339, false);
+                // DebugCommands.TryHandle(new[] { "world_settime", "1000" });
+                // DebugCommands.TryHandle(new[] { "teleport", "SamHouse", "306", "339" });
+                var items = new[] { "74", "773", "417", "324", "92", "220", "176", "417", "404", "22", "18" }; // Test items for all of jodi's tastes.
                 foreach (var item in items)
                 {
-                    helper.ConsoleCommands.Trigger("player_add", new string[] { "Object", item.ToString(), "10" });
+                    Game1.player.addItemToInventory(ItemRegistry.Create(item, 10));
+                    // DebugCommands.TryHandle(new[] { "player_add", "Object", item.ToString(), "10" });
                 }
             });
-            */
 #endif
         }
         #endregion
