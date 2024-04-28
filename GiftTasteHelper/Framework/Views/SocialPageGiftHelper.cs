@@ -44,11 +44,13 @@ namespace GiftTasteHelper.Framework
             this.SocialPage.OnResize(this.GetNativeSocialPage(menu));
         }
 
+        /*
         public override bool CanTick()
         {
             // we don't have a tab-changed event so don't tick when the social tab isn't open
             return this.IsCorrectMenuTab(Game1.activeClickableMenu) && base.CanTick();
         }
+        */
 
         public override void OnCursorMoved(CursorMovedEventArgs e)
         {
@@ -67,7 +69,14 @@ namespace GiftTasteHelper.Framework
 
         public override void OnPostUpdate(UpdateTickedEventArgs e)
         {
-            this.SocialPage.OnUpdate();
+            if (this.IsCorrectMenuTab(Game1.activeClickableMenu))
+            {
+                this.SocialPage.OnUpdate();
+            }
+            else
+            {
+                OnClose();
+            }
         }
 
         /*********
