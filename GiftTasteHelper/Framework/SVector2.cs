@@ -88,9 +88,9 @@ namespace GiftTasteHelper.Framework
             return new SVector2(font.MeasureString(s));
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
-            return (this == (SVector2)other);
+            return other is SVector2 v && this == v;
         }
 
         public override string ToString()

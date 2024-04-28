@@ -14,8 +14,8 @@ namespace GiftTasteHelper.Framework
         ** Properties
         *********/
         private readonly GiftConfig GiftConfig;
-        private SVector2 OrigHoverTextSize;
-        protected GiftDrawData CurrentGiftDrawData { get; private set; }
+        private SVector2 OrigHoverTextSize = SVector2.Zero;
+        protected GiftDrawData? CurrentGiftDrawData { get; private set; }
         protected bool DrawCurrentFrame;
 
         protected readonly IReflectionHelper Reflection;
@@ -91,7 +91,7 @@ namespace GiftTasteHelper.Framework
         public virtual bool CanDraw()
         {
             // Double check here since we may not be unsubscribed from post render right away when the calendar closes
-            if (!this.DrawCurrentFrame || this.CurrentGiftDrawData == null)
+            if (!this.DrawCurrentFrame || this.CurrentGiftDrawData is null)
             {
                 return false;
             }
@@ -105,7 +105,10 @@ namespace GiftTasteHelper.Framework
 
         public virtual void OnDraw()
         {
-            this.DrawGiftTooltip(this.CurrentGiftDrawData, this.TooltipTitle());
+            if (this.CurrentGiftDrawData is not null)
+            {
+                this.DrawGiftTooltip(this.CurrentGiftDrawData, this.TooltipTitle());
+            }
         }
 
         public virtual bool WantsUpdateEvent()
@@ -134,7 +137,7 @@ namespace GiftTasteHelper.Framework
         #region Drawing
         protected string TooltipTitle()
         {
-            return this.CurrentGiftDrawData.Gifts.Length > 0
+            return this.CurrentGiftDrawData is not null && this.CurrentGiftDrawData.Gifts.Length > 0
                 ? this.Translation.Get("tooltip.title.favorite")
                 : this.Translation.Get("tooltip.title.none");
         }

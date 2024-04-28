@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -18,7 +17,7 @@ namespace GiftTasteHelper.Framework
 
         // The currently hovered day.
         private int HoveredDay = Calendar.InvalidDay;
-        private string SeasonLastOpenedOn = null;
+        private string? SeasonLastOpenedOn = null;
 
         /*********
         ** Public methods
@@ -118,7 +117,10 @@ namespace GiftTasteHelper.Framework
         public override void OnDraw()
         {
             // Draw the tooltip
-            this.DrawGiftTooltip(this.CurrentGiftDrawData, this.TooltipTitle(), this.Calendar.GetCurrentHoverText());
+            if (this.CurrentGiftDrawData is not null)
+            {
+                this.DrawGiftTooltip(this.CurrentGiftDrawData, this.TooltipTitle(), this.Calendar.GetCurrentHoverText());
+            }
         }
 
         private void LoadBirthdays()

@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using Netcode;
+﻿using Netcode;
 using StardewValley;
 using StardewValley.Network;
+using Object = StardewValley.Object;
 
 namespace GiftTasteHelper.Framework
 {
     internal class GiftMonitor : IGiftMonitor
     {
-        public event GiftGivenDelegate GiftGiven;
+        public event GiftGivenDelegate? GiftGiven;
 
         private Object ActiveObject => Game1.player.ActiveObject;
         private uint GiftsGiven => Game1.stats.GiftsGiven;
@@ -23,9 +23,9 @@ namespace GiftTasteHelper.Framework
         // Last known number of gifts given so we can check when the stat value changes.
         private uint PriorGiftsGiven;
         // Currently held gift.
-        private Object HeldGift;
+        private Object? HeldGift;
         // Last known state of which npc's have been given gifts. Must be reset when the day changes.
-        private Dictionary<string, bool> GiftsGivenToday;
+        private Dictionary<string, bool> GiftsGivenToday = new();
 
         public bool IsHoldingValidGift => this.HeldGift != null;
 
@@ -64,7 +64,7 @@ namespace GiftTasteHelper.Framework
             // If the stat value changed then a gift was given.
             if (this.GiftsGiven != this.PriorGiftsGiven)
             {
-                string npcGivenTo = null;
+                string? npcGivenTo = null;
                 foreach (var friendpair in this.Friendships.Pairs)
                 {
                     if (!this.GiftsGivenToday.ContainsKey(friendpair.Key))
@@ -87,10 +87,10 @@ namespace GiftTasteHelper.Framework
                 var itemId = this.HeldGift.itemId.Value;
                 this.HeldGift = null;
 
-                if (Utils.Ensure(npcGivenTo != null, "NPC given to is null!"))
+                if (npcGivenTo is not null)
                 {
                     // Notify a gift was given.
-                    GiftGiven(npcGivenTo, itemId);
+                    GiftGiven?.Invoke(npcGivenTo, itemId);
                 }
             }
         }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
@@ -14,22 +12,22 @@ namespace GiftTasteHelper.Framework
         ** Properties
         *********/
         /// <summary>The underlying social menu.</summary>
-        private SDVSocialPage NativeSocialPage;
+        private SDVSocialPage? NativeSocialPage;
 
         /// <summary>Simplifies access to private game code.</summary>
-        private IReflectionHelper Reflection;
+        private IReflectionHelper? Reflection;
 
-        private List<ClickableTextureComponent> FriendSlots;
+        private List<ClickableTextureComponent> FriendSlots = new();
 
         private int FirstCharacterIndex;
-        private SVector2 SlotBoundsOffset;
+        private SVector2 SlotBoundsOffset = SVector2.Zero;
         private float SlotHeight;
         private Rectangle PageBounds;
         private int LastSlotIndex;
 
         /// <summary>Fires when the current slot index changes due to scrolling the list.</summary>
         public delegate void SlotIndexChangedDelegate();
-        public event SlotIndexChangedDelegate OnSlotIndexChanged;
+        public event SlotIndexChangedDelegate? OnSlotIndexChanged;
 
 
         /*********
@@ -41,10 +39,15 @@ namespace GiftTasteHelper.Framework
             this.OnResize(nativePage);
         }
 
-        public void OnResize(SDVSocialPage nativePage)
+        public void OnResize(SDVSocialPage? nativePage)
         {
             this.NativeSocialPage = nativePage;
-            this.FriendSlots = this.Reflection.GetField<List<ClickableTextureComponent>>(this.NativeSocialPage, "sprites").GetValue();
+            if (this.NativeSocialPage is null)
+            {
+                return;
+            }
+
+            this.FriendSlots = this.Reflection?.GetField<List<ClickableTextureComponent>>(this.NativeSocialPage, "sprites").GetValue() ?? new();
 
             // Find the first NPC character slot
             this.FirstCharacterIndex = this.NativeSocialPage.SocialEntries.FindIndex(entry => !entry.IsPlayer);
@@ -69,7 +72,7 @@ namespace GiftTasteHelper.Framework
             int slotIndex = this.GetSlotIndex();
             if (slotIndex != this.LastSlotIndex)
             {
-                OnSlotIndexChanged.Invoke();
+                OnSlotIndexChanged?.Invoke();
                 this.LastSlotIndex = slotIndex;
             }
         }
@@ -77,7 +80,7 @@ namespace GiftTasteHelper.Framework
         public string GetCurrentlyHoveredNpc(SVector2 mousePos)
         {
             int slotIndex = this.GetSlotIndex();
-            if (slotIndex < 0 || slotIndex >= this.FriendSlots.Count)
+            if (slotIndex < 0 || slotIndex >= this.FriendSlots.Count || this.NativeSocialPage is null)
             {
                 Utils.DebugLog("SlotIndex is invalid", LogLevel.Error);
                 return string.Empty;
@@ -109,6 +112,10 @@ namespace GiftTasteHelper.Framework
 
         private int GetSlotIndex()
         {
+            if (this.NativeSocialPage is null || this.Reflection is null)
+            {
+                return 0;
+            }
             return this.Reflection.GetField<int>(this.NativeSocialPage, "slotPosition").GetValue();
         }
 

@@ -29,7 +29,7 @@ namespace GiftTasteHelper.Framework
         /*********
         ** Properties
         *********/
-        private static IMonitor MonitorRef;
+        private static IMonitor? MonitorRef;
 
 
         /*********
