@@ -69,7 +69,7 @@ namespace GiftTasteHelper.Framework
 
         public override void OnPostUpdate(UpdateTickedEventArgs e)
         {
-            if (this.IsCorrectMenuTab(Game1.activeClickableMenu))
+            if (IsCorrectMenuTab(Game1.activeClickableMenu))
             {
                 this.SocialPage.OnUpdate();
             }
@@ -91,7 +91,7 @@ namespace GiftTasteHelper.Framework
             }
         }
 
-        private bool IsCorrectMenuTab(IClickableMenu menu)
+        private static bool IsCorrectMenuTab(IClickableMenu menu)
         {
             return menu is GameMenu gameMenu && gameMenu.currentTab == GameMenu.socialTab;
         }

@@ -9,8 +9,8 @@ namespace GiftTasteHelper.Framework
     {
         public event GiftGivenDelegate? GiftGiven;
 
-        private Object ActiveObject => Game1.player.ActiveObject;
-        private uint GiftsGiven => Game1.stats.GiftsGiven;
+        private static Object ActiveObject => Game1.player.ActiveObject;
+        private static uint GiftsGiven => Game1.stats.GiftsGiven;
 
         // 0 = Friendship level
         // 1 = gifts given this week
@@ -18,7 +18,7 @@ namespace GiftTasteHelper.Framework
         // 3 = has player given them a gift today
         // 4 = has proposed when friendship level too low?
         // 5 = ?
-        private NetStringDictionary<Friendship, NetRef<Friendship>> Friendships => Game1.player.friendshipData;
+        private static NetStringDictionary<Friendship, NetRef<Friendship>> Friendships => Game1.player.friendshipData;
 
         // Last known number of gifts given so we can check when the stat value changes.
         private uint PriorGiftsGiven;
@@ -32,7 +32,7 @@ namespace GiftTasteHelper.Framework
         /// <summary>Initializes the GiftMonitor.</summary>
         public void Load()
         {
-            this.PriorGiftsGiven = this.GiftsGiven;
+            this.PriorGiftsGiven = GiftsGiven;
             this.HeldGift = null;
             RebuildGiftsGiven();
         }
@@ -46,10 +46,10 @@ namespace GiftTasteHelper.Framework
         /// <summary>Sets the internally held item to what the player is currently holding. Should be called when right click it pressed.</summary>
         public void UpdateHeldGift()
         {
-            if (this.ActiveObject != null && this.ActiveObject.canBeGivenAsGift())
+            if (ActiveObject != null && ActiveObject.canBeGivenAsGift())
             {
-                Utils.DebugLog($"Set held item to {this.ActiveObject.Name}");
-                this.HeldGift = this.ActiveObject;
+                Utils.DebugLog($"Set held item to {ActiveObject.Name}");
+                this.HeldGift = ActiveObject;
             }
         }
 
@@ -62,10 +62,10 @@ namespace GiftTasteHelper.Framework
             }
 
             // If the stat value changed then a gift was given.
-            if (this.GiftsGiven != this.PriorGiftsGiven)
+            if (GiftsGiven != this.PriorGiftsGiven)
             {
                 string? npcGivenTo = null;
-                foreach (var friendpair in this.Friendships.Pairs)
+                foreach (var friendpair in Friendships.Pairs)
                 {
                     if (!this.GiftsGivenToday.ContainsKey(friendpair.Key))
                     {
@@ -83,7 +83,7 @@ namespace GiftTasteHelper.Framework
                     }
                 }
 
-                this.PriorGiftsGiven = this.GiftsGiven;
+                this.PriorGiftsGiven = GiftsGiven;
                 var itemId = this.HeldGift.itemId.Value;
                 this.HeldGift = null;
 
@@ -98,7 +98,7 @@ namespace GiftTasteHelper.Framework
         private void RebuildGiftsGiven()
         {
             this.GiftsGivenToday = new Dictionary<string, bool>();
-            foreach (var friendpair in this.Friendships.Pairs)
+            foreach (var friendpair in Friendships.Pairs)
             {
                 // Third element is whether a gift has been given today.
                 GiftsGivenToday.Add(friendpair.Key, friendpair.Value.GiftsToday > 0);

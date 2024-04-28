@@ -8,7 +8,7 @@ namespace GiftTasteHelper.Framework
         /*********
         ** Accessors
         *********/
-        public static SVector2 Zero => new SVector2();
+        public static SVector2 Zero => new();
 
         public float X { get; set; }
         public float Y { get; set; }

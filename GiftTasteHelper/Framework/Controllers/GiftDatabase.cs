@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using StardewValley;
 
 namespace GiftTasteHelper.Framework
@@ -9,7 +6,7 @@ namespace GiftTasteHelper.Framework
     /// <summary>Database for storing NPC gift tastes.</summary>
     internal class GiftDatabase : IGiftDatabase
     {
-        public event DataSourceChangedDelegate DatabaseChanged;
+        public event DataSourceChangedDelegate? DatabaseChanged;
 
         public GiftDatabaseModel Database { get; protected set; }
         protected readonly IModHelper Helper;
@@ -54,7 +51,7 @@ namespace GiftTasteHelper.Framework
             if (!check || !ContainsGift(npcName, itemId, taste))
             {
                 Utils.DebugLog($"Adding {itemId} to {npcName}'s {taste} tastes.");
-                Database.Entries[npcName].Add(taste, new GiftModel() { ItemId = itemId });
+                Database.Entries[npcName].Add(taste, new GiftModel(itemId));
 
                 DatabaseChanged?.Invoke();
                 return true;
@@ -79,7 +76,7 @@ namespace GiftTasteHelper.Framework
             var unique = itemIds.Where(id => !ContainsGift(npcName, id, taste)).Select(id => id);
             if (unique.Any())
             {
-                Database.Entries[npcName].AddRange(taste, itemIds.Select(id => new GiftModel() { ItemId = id }));
+                Database.Entries[npcName].AddRange(taste, itemIds.Select(id => new GiftModel(id)));
                 DatabaseChanged?.Invoke();
                 return true;
             }
@@ -91,8 +88,7 @@ namespace GiftTasteHelper.Framework
         {
             if (Database.Entries.ContainsKey(npcName))
             {
-                var entryForTaste = Database.Entries[npcName][taste];
-                if (entryForTaste != null)
+                if (Database.Entries[npcName].Entries.TryGetValue(taste, out var entryForTaste))
                 {
                     return entryForTaste.Select(model => model.ItemId).ToArray();
                 }
@@ -166,7 +162,12 @@ namespace GiftTasteHelper.Framework
 
         public static void MigrateDatabase(IModHelper helper, string fromPath, ref StoredGiftDatabase newDb)
         {
-            GiftDatabaseModel fromDatabaseModel = helper.Data.ReadJsonFile<GiftDatabaseModel>(fromPath);
+            GiftDatabaseModel? fromDatabaseModel = helper.Data.ReadJsonFile<GiftDatabaseModel>(fromPath);
+            if (fromDatabaseModel is null)
+            {
+                return;
+            }
+
             if (newDb.Database.Entries.Keys.Count == 0)
             {
                 newDb.Database = fromDatabaseModel;

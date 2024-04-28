@@ -20,7 +20,7 @@ namespace GiftTasteHelper
         ** Properties
         *********/
         private ModConfig Config = new();
-        private Dictionary<long, MultiplayerContext> MultiplayerGiftHelperMap = new();
+        private readonly Dictionary<long, MultiplayerContext> MultiplayerGiftHelperMap = new();
         private Dictionary<Type, IGiftHelper> GiftHelpers 
         { 
             get
@@ -324,7 +324,7 @@ namespace GiftTasteHelper
             if (Config.ShowOnlyKnownGifts)
             {
                 // The prefix is purely for convenience. Mostly so I know which is which.
-                string prefix = new string(Game1.player.Name.Where(char.IsLetterOrDigit).ToArray());
+                string prefix = new(Game1.player.Name.Where(char.IsLetterOrDigit).ToArray());
                 string path = this.Config.ShareKnownGiftsWithAllSaves
                     ? Path.Combine(StoredGiftDatabase.DBRoot, StoredGiftDatabase.DBFileName)
                     : Path.Combine(StoredGiftDatabase.DBRoot, $"{prefix}_{Game1.player.UniqueMultiplayerID}", StoredGiftDatabase.DBFileName);
@@ -589,6 +589,7 @@ namespace GiftTasteHelper
         }
 
         #region Debug
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "DEBUG")]
         void InitDebugCommands(IModHelper helper)
         {
 #if DEBUG

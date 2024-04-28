@@ -12,8 +12,8 @@ namespace GiftTasteHelper.Framework
         ** Properties
         *********/
         /// <summary>The underlying calendar.</summary>
-        private readonly Calendar Calendar = new Calendar();
-        private readonly Dictionary<int, NPC> Birthdays = new Dictionary<int, NPC>();
+        private readonly Calendar Calendar = new();
+        private readonly Dictionary<int, NPC> Birthdays = new();
 
         // The currently hovered day.
         private int HoveredDay = Calendar.InvalidDay;
