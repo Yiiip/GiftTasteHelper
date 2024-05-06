@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
@@ -13,7 +10,7 @@ namespace GiftTasteHelper.Framework
         // From https://stackoverflow.com/a/489421
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
         {
-            HashSet<TKey> seenKeys = new HashSet<TKey>();
+            HashSet<TKey> seenKeys = new();
             foreach (TSource element in source)
             {
                 if (seenKeys.Add(keySelector(element)))
@@ -29,7 +26,7 @@ namespace GiftTasteHelper.Framework
         /*********
         ** Properties
         *********/
-        private static IMonitor MonitorRef;
+        private static IMonitor? MonitorRef;
 
 
         /*********
@@ -94,7 +91,7 @@ namespace GiftTasteHelper.Framework
         }
 
         // TODO: Move all the gift stuff elsewhere
-        public static readonly Dictionary<string, GiftTaste> UniversalTastes = new Dictionary<string, GiftTaste>
+        public static readonly Dictionary<string, GiftTaste> UniversalTastes = new()
         {
             ["Universal_Love"]      = GiftTaste.Love,
             ["Universal_Loved"]     = GiftTaste.Love,
@@ -107,7 +104,7 @@ namespace GiftTasteHelper.Framework
             ["Universal_Hated"]     = GiftTaste.Hate
         };
 
-        public static readonly Dictionary<GiftTaste, string> UniversalTasteNames = new Dictionary<GiftTaste, string>
+        public static readonly Dictionary<GiftTaste, string> UniversalTasteNames = new()
         {
             [GiftTaste.Love]        = "Universal_Love",
             [GiftTaste.Like]        = "Universal_Like",
@@ -116,7 +113,7 @@ namespace GiftTasteHelper.Framework
             [GiftTaste.Hate]        = "Universal_Hate"
         };
 
-        public static readonly Dictionary<int, GiftTaste> TasteIndexMap = new Dictionary<int, GiftTaste>
+        public static readonly Dictionary<int, GiftTaste> TasteIndexMap = new()
         {
             // metadata is paired: odd values contain a list of item references, even values contain the reaction dialogue
             [1] = GiftTaste.Love,
