@@ -148,6 +148,11 @@ namespace GiftTasteHelper.Framework
 
         protected void DrawGiftTooltip(GiftDrawData drawData, string title, string originalTooltipText = "")
         {
+            if (!string.IsNullOrEmpty(drawData.NpcName))
+            {
+                title = drawData.NpcName + title;
+            }
+
             int numItemsToDraw = CalculateNumberOfGiftsToDisplay(drawData.Gifts.Length, this.GiftConfig.MaxGiftsToDisplay);
             if (numItemsToDraw == 0 && this.GiftConfig.HideTooltipWhenNoGiftsKnown)
             {

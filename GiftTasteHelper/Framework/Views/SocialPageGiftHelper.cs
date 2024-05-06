@@ -38,6 +38,12 @@ namespace GiftTasteHelper.Framework
             return base.OnOpen(menu);
         }
 
+        public override void OnClose()
+        {
+            this.LastHoveredNpc = string.Empty;
+            base.OnClose();
+        }
+
         public override void OnResize(IClickableMenu menu)
         {
             base.OnResize(menu);
@@ -50,6 +56,11 @@ namespace GiftTasteHelper.Framework
             return this.IsCorrectMenuTab(Game1.activeClickableMenu) && base.CanTick();
         }
 
+        public override bool CanDraw()
+        {
+            return this.IsCorrectMenuTab(Game1.activeClickableMenu) && base.CanDraw();
+        }
+
         public override void OnCursorMoved(CursorMovedEventArgs e)
         {
             Debug.Assert(this.IsCorrectMenuTab(Game1.activeClickableMenu));
@@ -59,6 +70,11 @@ namespace GiftTasteHelper.Framework
             }
 
             UpdateHoveredNPC(GetAdjustedCursorPosition(e.NewPosition.ScreenPixels.X, e.NewPosition.ScreenPixels.Y));
+        }
+
+        public override void OnDraw()
+        {
+            base.OnDraw();
         }
 
         public override bool WantsUpdateEvent()
@@ -111,6 +127,7 @@ namespace GiftTasteHelper.Framework
             if (hoveredNpc == string.Empty)
             {
                 this.DrawCurrentFrame = false;
+                this.LastHoveredNpc = string.Empty;
                 return;
             }
 
