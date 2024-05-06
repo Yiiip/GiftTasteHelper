@@ -58,10 +58,10 @@ namespace GiftTasteHelper.Framework
         }
         */
 
-        public override bool CanDraw()
-        {
-            return this.IsCorrectMenuTab(Game1.activeClickableMenu) && base.CanDraw();
-        }
+        //public override bool CanDraw()
+        //{
+        //    return IsCorrectMenuTab(Game1.activeClickableMenu) && base.CanDraw();
+        //}
 
         public override void OnCursorMoved(CursorMovedEventArgs e)
         {
